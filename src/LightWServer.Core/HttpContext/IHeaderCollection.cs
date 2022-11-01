@@ -1,6 +1,8 @@
-﻿namespace LightWServer.Core.HttpContext
+﻿using System.Collections;
+
+namespace LightWServer.Core.HttpContext
 {
-    internal interface IHeaderCollection
+    internal interface IHeaderCollection : IEnumerable<KeyValuePair<string, string>>
     {
         void Add(string key, string value);
         bool ContainsKey(string key);

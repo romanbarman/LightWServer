@@ -4,19 +4,19 @@ using LightWServer.Core.HttpContext.Responses;
 
 namespace LightWServer.Core.RequestHandlers
 {
-    public sealed class StaticFileRequestHandler : IRequestHandler
+    internal sealed class StaticFileRequestHandler : IRequestHandler
     {
         private readonly string path;
 
-        public StaticFileRequestHandler(string path)
+        internal StaticFileRequestHandler(string path)
         {
-            if (string.IsNullOrWhiteSpace(path))
-                throw new ArgumentNullException(nameof(path));
+            if (path.Trim().Equals(string.Empty))
+                throw new ArgumentException("Path is empty", nameof(path));
 
             this.path = path;
         }
 
-        internal Response Handle(Request request)
+        public Response Handle(Request request)
         {
             var filePath = Path.Combine(path, request.Path);
 
@@ -25,16 +25,11 @@ namespace LightWServer.Core.RequestHandlers
                 : new Response(HttpStatusCode.NotFound, HeaderCollection.CreateForResponse());
         }
 
-        Response IRequestHandler.Handle(Request request)
-        {
-            return Handle(request);
-        }
-
         private static FileResponse Create(string filePath)
         {
             var fileInfo = new FileInfo(filePath);
 
-            var headerCollection = new HeaderCollection();
+            var headerCollection = HeaderCollection.CreateForResponse();
             headerCollection.Add("Accept-Ranges", "bytes");
             headerCollection.Add("Content-Length", fileInfo.Length.ToString());
             headerCollection.Add("Content-Type", GetContentType(fileInfo.Extension));

@@ -7,7 +7,7 @@ namespace LightWServer.Core
     {
         private int port = 80;
         private StaticFileRequestHandler staticFileRequestHandler = new StaticFileRequestHandler("www");
-        private ILog log = new SimpleComsoleLog();
+        private ILog log = new SimpleConsoleLog();
 
         public ServerBuilder SetPort(int port)
         {
@@ -21,8 +21,11 @@ namespace LightWServer.Core
 
         public ServerBuilder SetStaticFileRequestHandler(string path)
         {
-            if (string.IsNullOrWhiteSpace(path))
+            if (path == null)
                 throw new ArgumentNullException(nameof(path));
+
+            if (path.Trim().Equals(string.Empty))
+                throw new ArgumentException("Path is empty", nameof(path));
 
             staticFileRequestHandler = new StaticFileRequestHandler(path);
 
