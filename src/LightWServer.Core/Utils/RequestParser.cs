@@ -1,5 +1,6 @@
 ﻿using LightWServer.Core.Exceptions;
 using LightWServer.Core.HttpContext;
+using System.Globalization;
 
 namespace LightWServer.Core.Utils
 {
@@ -48,10 +49,10 @@ namespace LightWServer.Core.Utils
             if (index == -1)
                 throw new InvalidRequestException("Invalid header format");
 
-            var key = header.Substring(0, index);
-            var value = header.Substring(index + HeaderSeparator.Length);
+            var key = header.Substring(0, index).Trim();
+            var value = header.Substring(index + HeaderSeparator.Length).Trim();
 
-            if (key.Length == 0 || value.Length == 0)
+            if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
                 throw new InvalidRequestException("Invalid header key or value format");
 
             return (key, value);
@@ -87,9 +88,9 @@ namespace LightWServer.Core.Utils
             if (string.IsNullOrWhiteSpace(httpVersion) || !httpVersion.StartsWith(httpStart))
                 throw new InvalidRequestException("Invalid HTTP version");
 
-            var version = httpVersion.Substring(httpStart.Length - 1);
+            var version = httpVersion.Substring(httpStart.Length);
 
-            if (double.TryParse(version, out var _))
+            if (!double.TryParse(version, NumberStyles.Any, CultureInfo.InvariantCulture, out var _))
                 throw new InvalidRequestException("Invalid HTTP version value");
 
             return version;

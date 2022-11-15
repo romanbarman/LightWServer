@@ -1,4 +1,9 @@
-﻿namespace LightWServer.Core.HttpContext
+﻿using System.Collections;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("LightWServer.Core.Test")]
+
+namespace LightWServer.Core.HttpContext
 {
     internal sealed class HeaderCollection : IHeaderCollection
     {
@@ -6,18 +11,18 @@
 
         public void Add(string key, string value)
         {
-            if (string.IsNullOrWhiteSpace(key))
-                throw new ArgumentNullException(nameof(key));
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentNullException(nameof(value));
+            if (key.Trim().Equals(string.Empty))
+                throw new ArgumentException("Key is empty", nameof(key));
+            if (value.Trim().Equals(string.Empty))
+                throw new ArgumentException("Value is empty", nameof(value));
 
             headers[key] = value;
         }
 
         public bool ContainsKey(string key)
         {
-            if (string.IsNullOrWhiteSpace(key))
-                throw new ArgumentNullException(nameof(key));
+            if (key.Trim().Equals(string.Empty))
+                throw new ArgumentException("Key is empty", nameof(key));
 
             return headers.ContainsKey(key);
         }
@@ -29,8 +34,8 @@
 
         public string GetValue(string key)
         {
-            if (string.IsNullOrWhiteSpace(key))
-                throw new ArgumentNullException(nameof(key));
+            if (key.Trim().Equals(string.Empty))
+                throw new ArgumentException("Key is empty", nameof(key));
 
             if (!headers.ContainsKey(key))
                 throw new ArgumentOutOfRangeException(nameof(key), $"The header '{key}' does not exist");
@@ -44,6 +49,16 @@
             headerCollection.Add("Server", "LightWServer/0.0.01");
 
             return headerCollection;
+        }
+
+        public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
+        {
+            return headers.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

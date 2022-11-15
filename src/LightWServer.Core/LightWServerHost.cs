@@ -16,8 +16,8 @@ namespace LightWServer.Core
 
         internal LightWServerHost(IRequestHandler handler, ILog log, int port)
         {
-            this.handler = handler ?? throw new ArgumentNullException(nameof(handler));
-            this.log = log ?? throw new ArgumentNullException(nameof(log));
+            this.handler = handler;
+            this.log = log;
 
             if (port < 1)
                 throw new ArgumentException("Invalid port", nameof(port));

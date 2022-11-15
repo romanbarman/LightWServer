@@ -2,15 +2,15 @@
 
 namespace LightWServer.Core.HttpContext.Responses
 {
-    internal class FileResponse : Response
+    public class FileResponse : Response
     {
-        public string FilePath { get; }
+        internal string FilePath { get; }
 
-        public FileResponse(HttpStatusCode statusCode, IHeaderCollection headerCollection, string filePath)
+        internal FileResponse(HttpStatusCode statusCode, IHeaderCollection headerCollection, string filePath)
             : base(statusCode, headerCollection)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-                throw new ArgumentNullException(nameof(filePath));
+            if (filePath.Trim().Equals(string.Empty))
+                throw new ArgumentException("File path is empty", nameof(filePath));
 
             FilePath = filePath;
         }
