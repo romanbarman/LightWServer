@@ -28,6 +28,8 @@ namespace LightWServer.Core.Test.RequestHandlers
         [InlineData(".csv", "text/csv")]
         [InlineData(".html", "text/html")]
         [InlineData(".js", "text/javascript")]
+        [InlineData(".pdf", "application/pdf")]
+        [InlineData(".jpg", "image/jpg")]
         public void Handle_If_File_Exist_Should_Return_FileResponse(string extension, string expectedContentType)
         {
             const string RootPath = "Files";

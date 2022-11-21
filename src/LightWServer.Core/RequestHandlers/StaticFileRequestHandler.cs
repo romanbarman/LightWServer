@@ -47,6 +47,8 @@ namespace LightWServer.Core.RequestHandlers
             ".csv" => "text/csv",
             ".html" => "text/html",
             ".js" => "text/javascript",
+            ".pdf" => "application/pdf",
+            ".jpg" => "image/jpg",
             _ => "text/html"
         };
     }
