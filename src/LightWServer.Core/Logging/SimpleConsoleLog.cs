@@ -1,11 +1,12 @@
 ﻿using System.Globalization;
-using System.Net;
 using System.Text;
 
 namespace LightWServer.Core.Logging
 {
     internal sealed class SimpleConsoleLog : ILog
     {
+        private static object locker = new object();
+
         public void Log(LogLevel logLevel, string message)
         {
             if (message.Trim().Equals(string.Empty))
@@ -24,10 +25,13 @@ namespace LightWServer.Core.Logging
 
         private static void Write(LogLevel logLevel, string log)
         {
-            var previousColor = Console.ForegroundColor;
-            Console.ForegroundColor = GetConsoleColor(logLevel);
-            Console.WriteLine(log);
-            Console.ForegroundColor = previousColor;
+            lock (locker)
+            {
+                var previousColor = Console.ForegroundColor;
+                Console.ForegroundColor = GetConsoleColor(logLevel);
+                Console.WriteLine(log);
+                Console.ForegroundColor = previousColor;
+            }
         }
 
         private static string Format(LogLevel logLevel, string message, Exception? exception = null)
@@ -37,10 +41,11 @@ namespace LightWServer.Core.Logging
             sb.Append(" - [");
             sb.Append(logLevel.ToString().ToUpper());
             sb.Append("] ");
-            sb.AppendLine(message);
+            sb.Append(message);
 
             if (exception != null)
             {
+                sb.AppendLine();
                 sb.Append(exception);
             }
 
