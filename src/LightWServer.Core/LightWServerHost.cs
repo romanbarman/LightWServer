@@ -1,8 +1,10 @@
-﻿using LightWServer.Core.Logging;
+﻿using LightWServer.Core.HttpContext;
+using LightWServer.Core.Logging;
 using LightWServer.Core.RequestHandlers;
 using LightWServer.Core.Utils;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
 namespace LightWServer.Core
 {
@@ -29,7 +31,7 @@ namespace LightWServer.Core
         {
             var listener = new TcpListener(IPAddress.Any, port);
             listener.Start();
-            log.Log(LogLevel.Information, "Server start");
+            LogStart();
 
             while (true)
             {
@@ -42,17 +44,20 @@ namespace LightWServer.Core
         {
             using (var networkStream = client.GetStream())
             {
+                Request? request = null;
+                Response? response = null;
+
                 try
                 {
-                    var request = await RequestParser.ReadAsync(networkStream);
+                    request = await RequestParser.ReadAsync(networkStream);
 
-                    var response = handler.Handle(request);
+                    response = handler.Handle(request);
 
                     await ResponseWriter.WriteResponse(response, networkStream);
                 }
                 catch(Exception ex)
                 {
-                    var response = ExceptionUtil.ExceptionToResponse(ex);
+                    response = ExceptionUtil.ExceptionToResponse(ex);
 
                     if (networkStream != null && networkStream.CanWrite)
                     {
@@ -63,7 +68,29 @@ namespace LightWServer.Core
                         response.StatusCode == HttpStatusCode.InternalServerError ? UnexpectedErrorMessage : ex.Message,
                         ex);
                 }
+
+                if (request != null && response != null)
+                    LogResult(request, response);
             }
+        }
+
+        private void LogStart()
+        {
+            log.Log(LogLevel.Information, "Server start");
+            log.Log(LogLevel.Information, $"Address: http://localhost:{port}");
+        }
+
+        private void LogResult(Request request, Response response)
+        {
+            var resultMessage = new StringBuilder();
+            resultMessage.Append($"{request.HttpMethod} {request.Path}. ");
+
+            var headerInfo = string.Join("|", HeadersFilter.Filter(request).Select(x => $"{x.Key}:{x.Value}"));
+            resultMessage.Append($"{headerInfo}. ");
+
+            resultMessage.Append($"{(int)response.StatusCode} {response.StatusCode}");
+
+            log.Log(LogLevel.Information, resultMessage.ToString());
         }
     }
 }
