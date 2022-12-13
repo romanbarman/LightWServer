@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace LightWServer.Core.HttpContext
 {
-    internal sealed class HeaderCollection : IHeaderCollection
+    public sealed class HeaderCollection : IHeaderCollection
     {
         private readonly Dictionary<string, string> headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
