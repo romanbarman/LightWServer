@@ -85,7 +85,7 @@ namespace LightWServer.Core
             var resultMessage = new StringBuilder();
             resultMessage.Append($"{request.HttpMethod} {request.Path}. ");
 
-            var headerInfo = string.Join("|", HeadersFilter.Filter(request).Select(x => $"{x.Key}:{x.Value}"));
+            var headerInfo = string.Join("|", HeadersFilter.Filter(request).Select(x => $"{x.Name}:{x.Value}"));
             resultMessage.Append($"{headerInfo}. ");
 
             resultMessage.Append($"{(int)response.StatusCode} {response.StatusCode}");

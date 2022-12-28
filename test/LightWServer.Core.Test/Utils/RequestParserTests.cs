@@ -51,10 +51,7 @@ namespace LightWServer.Core.Test.Utils
             Assert.Equal(expectedResult.Path, result.Path);
             Assert.Equal(expectedResult.HttpVersion, result.HttpVersion);
             Assert.Equal(expectedResult.HttpMethod, result.HttpMethod);
-            Assert.Equal(expectedResult.Headers.GetKeys(), result.Headers.GetKeys());
-
-            foreach (var header in expectedResult.Headers.GetKeys())
-                Assert.Equal(expectedResult.Headers.GetValue(header), result.Headers.GetValue(header));
+            Assert.Equal(expectedResult.Headers, result.Headers);
         }
 
         public static IEnumerable<object[]> InvalidData =>
@@ -79,17 +76,18 @@ namespace LightWServer.Core.Test.Utils
             new object[]
             {
                 $"GET /Index HTTP/1.1{Environment.NewLine}Accept-Ranges: bytes{Environment.NewLine}Service: LightWServer/0.0.01",
-                new Request("1.1", "Index", HttpMethod.Get, new HeaderCollection(){ { "Accept-Ranges", "bytes" }, { "Service", "LightWServer/0.0.01" } })
+                new Request("1.1", "Index", HttpMethod.Get,
+                    HeaderCollectionBuilder.Create(new Header("Accept-Ranges", "bytes"), new Header("Service", "LightWServer/0.0.01")))
             },
             new object[]
             {
                 $"GET Index HTTP/1.1{Environment.NewLine}Service: LightWServer/0.0.01",
-                new Request("1.1", "Index", HttpMethod.Get, new HeaderCollection(){ { "Service", "LightWServer/0.0.01" } })
+                new Request("1.1", "Index", HttpMethod.Get, HeaderCollectionBuilder.Create(new Header("Service", "LightWServer/0.0.01")))
             },
             new object[]
             {
                 $"GET /Index",
-                new Request("0.9", "Index", HttpMethod.Get, new HeaderCollection())
+                new Request("0.9", "Index", HttpMethod.Get, HeaderCollection.CreateForRequest())
             }
         };
     }

@@ -1,64 +1,46 @@
-﻿using System.Collections;
+﻿using LightWServer.Core.Exceptions;
+using System.Collections;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("LightWServer.Core.Test")]
 
 namespace LightWServer.Core.HttpContext
 {
-    public sealed class HeaderCollection : IHeaderCollection
+    internal sealed class HeaderCollection : IHeaderCollection
     {
-        private readonly Dictionary<string, string> headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, Header> headers = new Dictionary<string, Header>(StringComparer.OrdinalIgnoreCase);
 
-        public void Add(string key, string value)
+        private HeaderCollection() { }
+
+        public void Add(string name, string value)
         {
-            if (key.Trim().Equals(string.Empty))
-                throw new ArgumentException("Key is empty", nameof(key));
-            if (value.Trim().Equals(string.Empty))
-                throw new ArgumentException("Value is empty", nameof(value));
-
-            headers[key] = value;
+            headers[name] = new Header(name, value);
         }
 
-        public bool ContainsKey(string key)
-        {
-            if (key.Trim().Equals(string.Empty))
-                throw new ArgumentException("Key is empty", nameof(key));
+        public bool Contains(string name) => headers.ContainsKey(name);
 
-            return headers.ContainsKey(key);
+        public IEnumerable<string> GetHeadersNames() => headers.Keys;
+
+        public string GetValue(string name)
+        {
+            if (!headers.ContainsKey(name))
+                throw new HeaderNotExistException(name);
+
+            return headers[name].Value;
         }
 
-        public IEnumerable<string> GetKeys()
+        public IEnumerator<Header> GetEnumerator() => headers.Select(x => x.Value).GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        internal static HeaderCollection CreateForRequest() => new HeaderCollection();
+
+        internal static HeaderCollection CreateForResponse()
         {
-            return headers.Keys;
-        }
-
-        public string GetValue(string key)
-        {
-            if (key.Trim().Equals(string.Empty))
-                throw new ArgumentException("Key is empty", nameof(key));
-
-            if (!headers.ContainsKey(key))
-                throw new ArgumentOutOfRangeException(nameof(key), $"The header '{key}' does not exist");
-
-            return headers[key];
-        }
-
-        internal static IHeaderCollection CreateForResponse()
-        {
-            var headerCollection =  new HeaderCollection();
+            var headerCollection = new HeaderCollection();
             headerCollection.Add("Server", "LightWServer/0.0.01");
 
             return headerCollection;
-        }
-
-        public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
-        {
-            return headers.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
     }
 }

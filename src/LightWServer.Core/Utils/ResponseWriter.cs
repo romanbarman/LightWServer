@@ -11,9 +11,9 @@ namespace LightWServer.Core.Utils
             {
                 await writer.WriteLineAsync($"HTTP/1.0 {(int)response.StatusCode} {response.StatusCode}");
 
-                foreach (var key in response.Headers.GetKeys())
+                foreach (var header in response.Headers)
                 {
-                    await writer.WriteLineAsync($"{key}: {response.Headers.GetValue(key)}");
+                    await writer.WriteLineAsync($"{header.Name}: {header.Value}");
                 }
 
                 await writer.WriteLineAsync();

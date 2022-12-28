@@ -9,9 +9,6 @@ namespace LightWServer.Core.Test.RequestHandlers
 {
     public class StaticFileRequestHandlerTests
     {
-        private const string ServerHeaderName = "Server";
-        private const string ServerHeaderValue = "LightWServer/0.0.01";
-
         [Fact]
         public void Constructor_If_Invalid_Path_Then_Throw_Exception()
         {
@@ -43,16 +40,13 @@ namespace LightWServer.Core.Test.RequestHandlers
             var expectedHeaders = CreateHeaderCollection(fileInfo.Length, expectedContentType);
 
             var underTest = new StaticFileRequestHandler(RootPath);
-            var response = underTest.Handle(new Request("1.1", fileName, HttpMethod.Get, new HeaderCollection())) as FileResponse;
+            var response = underTest.Handle(new Request("1.1", fileName, HttpMethod.Get, HeaderCollection.CreateForRequest())) as FileResponse;
 
             Assert.NotNull(response);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal(Path.Combine(RootPath, fileName), response.FilePath);
-
-            Assert.Equal(expectedHeaders.GetKeys(), response.Headers.GetKeys());
-
-            foreach (var header in expectedHeaders.GetKeys())
-                Assert.Equal(expectedHeaders.GetValue(header), response.Headers.GetValue(header));
+            Assert.Equal(expectedHeaders.GetHeadersNames(), response.Headers.GetHeadersNames());
+            Assert.Equal(expectedHeaders, response.Headers);
         }
 
         [Fact]
@@ -63,18 +57,17 @@ namespace LightWServer.Core.Test.RequestHandlers
             var fileName = "Test.txt";
 
             var underTest = new StaticFileRequestHandler(RootPath);
-            var response = underTest.Handle(new Request("1.1", fileName, HttpMethod.Get, new HeaderCollection()));
+            var response = underTest.Handle(new Request("1.1", fileName, HttpMethod.Get, HeaderCollection.CreateForRequest()));
 
             Assert.NotNull(response);
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-            Assert.Single(response.Headers.GetKeys());
-            Assert.Equal(ServerHeaderValue, response.Headers.GetValue(ServerHeaderName));
+            Assert.Single(response.Headers.GetHeadersNames());
+            Assert.Equal("Server", response.Headers.Single().Name);
         }
 
         private static HeaderCollection CreateHeaderCollection(long contentLength, string contentType)
         {
-            var headerCollection = new HeaderCollection();
-            headerCollection.Add(ServerHeaderName, ServerHeaderValue);
+            var headerCollection = HeaderCollection.CreateForResponse();
             headerCollection.Add("Accept-Ranges", "bytes");
             headerCollection.Add("Content-Length", contentLength.ToString());
             headerCollection.Add("Content-Type", contentType);

@@ -55,13 +55,8 @@ namespace LightWServer.Core.Test.Utils
             },
             new object[]
             {
-                new Response(HttpStatusCode.Redirect, new HeaderCollection { { "Server", "LightWServer/0.0.01" }, { "Accept-Ranges", "bytes" } }),
+                new Response(HttpStatusCode.Redirect, HeaderCollectionBuilder.Create(new Header("Server", "LightWServer/0.0.01"), new Header("Accept-Ranges", "bytes"))),
                 $"HTTP/1.0 302 Redirect{Environment.NewLine}Server: LightWServer/0.0.01{Environment.NewLine}Accept-Ranges: bytes{Environment.NewLine}{Environment.NewLine}"
-            },
-            new object[]
-            {
-                new Response(HttpStatusCode.NotFound, new HeaderCollection()),
-                $"HTTP/1.0 404 NotFound{Environment.NewLine}{Environment.NewLine}"
             }
         };
     }

@@ -9,17 +9,7 @@ namespace LightWServer.Core.Utils
             "Accept", "Accept-Charset", "Accept-Encoding", "Accept-Language", "Cache-Control", "Host", "Referer", "User-Agent"
         };
 
-        internal static IHeaderCollection Filter(Request request)
-        {
-            var result = new HeaderCollection();
-
-            foreach (var header in request.Headers)
-            {
-                if (HeadersForFilter.Contains(header.Key, StringComparer.OrdinalIgnoreCase))
-                    result.Add(header.Key, header.Value);
-            }
-
-            return result;
-        }
+        internal static IEnumerable<Header> Filter(Request request) => request.Headers
+            .Where(h => HeadersForFilter.Contains(h.Name, StringComparer.OrdinalIgnoreCase));
     }
 }

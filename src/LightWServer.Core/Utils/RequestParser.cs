@@ -26,7 +26,7 @@ namespace LightWServer.Core.Utils
 
         private static IHeaderCollection ParseHeaders(IList<string> headers)
         {
-            var headersCollection = new HeaderCollection();
+            var headersCollection = HeaderCollection.CreateForRequest();
 
             foreach (var header in headers)
             {
