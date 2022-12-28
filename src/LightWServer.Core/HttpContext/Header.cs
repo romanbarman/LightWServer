@@ -2,8 +2,8 @@
 {
     internal sealed class Header : IEquatable<Header>
     {
-        public string Name { get; }
-        public string Value { get; }
+        internal string Name { get; }
+        internal string Value { get; }
 
         internal Header(string name, string value)
         {

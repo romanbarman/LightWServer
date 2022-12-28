@@ -1,6 +1,6 @@
 ﻿namespace LightWServer.Core.HttpContext
 {
-    public sealed class Request
+    internal sealed class Request
     {
         internal string HttpVersion { get; }
         internal string Path { get; }

@@ -2,7 +2,7 @@
 
 namespace LightWServer.Core.HttpContext.Responses
 {
-    public class FileResponse : Response
+    internal sealed class FileResponse : Response
     {
         internal string FilePath { get; }
 

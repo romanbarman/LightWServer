@@ -8,9 +8,9 @@ namespace LightWServer.Core.Test.Utils
     {
         [Theory]
         [MemberData(nameof(Data))]
-        public void Filter_Should_Return_Headers(Request request, object expectedHeaders)
+        public void Filter_Should_Return_Headers(object request, object expectedHeaders)
         {
-            var headers = HeadersFilter.Filter(request);
+            var headers = HeadersFilter.Filter((Request)request);
 
             Assert.NotNull(headers);
             Assert.Equal(expectedHeaders, headers);

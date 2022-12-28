@@ -12,11 +12,11 @@ namespace LightWServer.Core.Test.Utils
     {
         [Theory]
         [MemberData(nameof(Data))]
-        public async Task WriteResponse_Should_Write_Response(Response response, string expectedResult)
+        public async Task WriteResponse_Should_Write_Response(object response, string expectedResult)
         {
             using var memoryStream = new MemoryStream();
 
-            await ResponseWriter.WriteResponse(response, memoryStream);
+            await ResponseWriter.WriteResponse((Response)response, memoryStream);
 
             var result = Encoding.UTF8.GetString(memoryStream.ToArray());
 

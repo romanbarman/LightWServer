@@ -42,16 +42,18 @@ namespace LightWServer.Core.Test.Utils
 
         [Theory]
         [MemberData(nameof(ValidData))]
-        public async Task ReadAsync_If_Valid_Request_Should_Return_Result(string request, Request expectedResult)
+        public async Task ReadAsync_If_Valid_Request_Should_Return_Result(string request, object expectedResult)
         {
             using var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(request));
 
             var result = await RequestParser.ReadAsync(memoryStream);
 
-            Assert.Equal(expectedResult.Path, result.Path);
-            Assert.Equal(expectedResult.HttpVersion, result.HttpVersion);
-            Assert.Equal(expectedResult.HttpMethod, result.HttpMethod);
-            Assert.Equal(expectedResult.Headers, result.Headers);
+            var expectedRequest = (Request)expectedResult;
+
+            Assert.Equal(expectedRequest.Path, result.Path);
+            Assert.Equal(expectedRequest.HttpVersion, result.HttpVersion);
+            Assert.Equal(expectedRequest.HttpMethod, result.HttpMethod);
+            Assert.Equal(expectedRequest.Headers, result.Headers);
         }
 
         public static IEnumerable<object[]> InvalidData =>
