@@ -2,9 +2,9 @@
 using LightWServer.Core.HttpContext;
 using System.Net;
 
-namespace LightWServer.Core.Utils
+namespace LightWServer.Core.Services.Mappers
 {
-    internal static class ExceptionUtil
+    internal sealed class ExceptionToResponseMapper : IExceptionToResponseMapper
     {
         private static readonly Dictionary<Type, HttpStatusCode> exceptionToHttpStatusCodeDictionary = new Dictionary<Type, HttpStatusCode>
         {
@@ -12,7 +12,7 @@ namespace LightWServer.Core.Utils
             { typeof(InvalidRequestException), HttpStatusCode.NotImplemented }
         };
 
-        internal static Response ExceptionToResponse(Exception exception)
+        public Response Map(Exception exception)
         {
             var exceptionType = exception.GetType();
             var statusCode = exceptionToHttpStatusCodeDictionary.ContainsKey(exceptionType)

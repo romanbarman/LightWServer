@@ -1,6 +1,7 @@
 ﻿using LightWServer.Core.HttpContext;
 using LightWServer.Core.Logging;
 using LightWServer.Core.RequestHandlers;
+using LightWServer.Core.Services.Mappers;
 using LightWServer.Core.Utils;
 using System.Net;
 using System.Net.Sockets;
@@ -12,12 +13,15 @@ namespace LightWServer.Core
     {
         private const string UnexpectedErrorMessage = "Unexpected error";
 
+        private readonly IExceptionToResponseMapper exceptionToResponseMapper;
         private readonly IRequestHandler handler;
         private readonly ILog log;
         private readonly int port;
 
-        internal LightWServerHost(IRequestHandler handler, ILog log, int port)
+        internal LightWServerHost(IExceptionToResponseMapper exceptionToResponseMapper,
+            IRequestHandler handler, ILog log, int port)
         {
+            this.exceptionToResponseMapper = exceptionToResponseMapper;
             this.handler = handler;
             this.log = log;
 
@@ -57,7 +61,7 @@ namespace LightWServer.Core
                 }
                 catch(Exception ex)
                 {
-                    response = ExceptionUtil.ExceptionToResponse(ex);
+                    response = exceptionToResponseMapper.Map(ex);
 
                     if (networkStream != null && networkStream.CanWrite)
                     {

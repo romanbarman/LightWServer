@@ -1,17 +1,17 @@
 ﻿using LightWServer.Core.Exceptions;
-using LightWServer.Core.Utils;
+using LightWServer.Core.Services.Mappers;
 using System.Net;
 using Xunit;
 
-namespace LightWServer.Core.Test.Utils
+namespace LightWServer.Core.Test.Services.Mappers
 {
-    public class ExceptionUtilTests
+    public class ExceptionToResponseMapperTests
     {
         [Theory]
         [MemberData(nameof(Data))]
         public void ExceptionToResponse_Should_Return_Response(Exception exception, HttpStatusCode expectedStatusCode)
         {
-            var response = ExceptionUtil.ExceptionToResponse(exception);
+            var response = new ExceptionToResponseMapper().Map(exception);
 
             Assert.NotNull(response);
             Assert.Equal(expectedStatusCode, response.StatusCode);
