@@ -9,17 +9,11 @@ namespace LightWServer.Core.Logging
 
         public void Log(LogLevel logLevel, string message)
         {
-            if (message.Trim().Equals(string.Empty))
-                throw new ArgumentException("Message is empty", nameof(message));
-
             Write(logLevel, Format(logLevel, message));
         }
 
         public void Log(LogLevel logLevel, string message, Exception exception)
         {
-            if (message.Trim().Equals(string.Empty))
-                throw new ArgumentException("Message is empty", nameof(message));
-
             Write(logLevel, Format(logLevel, message, exception));
         }
 

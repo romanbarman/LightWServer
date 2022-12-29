@@ -1,5 +1,4 @@
 ﻿using AutoFixture;
-using AutoFixture.Xunit2;
 using LightWServer.Core.Logging;
 using System.Globalization;
 using Xunit;
@@ -13,14 +12,6 @@ namespace LightWServer.Core.Test.Logging
         public SimpleConsoleLogTests()
         {
             fixture = new Fixture();
-        }
-
-        [Theory, AutoData]
-        public void Log_If_Invalid_Message_Then_Throw_Exception(LogLevel logLevel)
-        {
-            var underTest = new SimpleConsoleLog();
-
-            Assert.Throws<ArgumentException>(() => underTest.Log(logLevel, ""));
         }
 
         [Theory]
@@ -45,14 +36,6 @@ namespace LightWServer.Core.Test.Logging
 
             var date = Convert.ToDateTime(log.Substring(0, log.IndexOf(" - [")), CultureInfo.CurrentCulture);
             Assert.InRange(date, DateTime.Now.AddSeconds(-5), DateTime.Now.AddSeconds(5));
-        }
-
-        [Theory, AutoData]
-        public void Log_With_Exception_If_Invalid_Message_Then_Throw_Exception(LogLevel logLevel, Exception exception)
-        {
-            var underTest = new SimpleConsoleLog();
-
-            Assert.Throws<ArgumentException>(() => underTest.Log(logLevel, "", exception));
         }
 
         [Theory]
