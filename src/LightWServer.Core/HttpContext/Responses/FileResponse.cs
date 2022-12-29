@@ -9,9 +9,6 @@ namespace LightWServer.Core.HttpContext.Responses
         internal FileResponse(HttpStatusCode statusCode, IHeaderCollection headerCollection, string filePath)
             : base(statusCode, headerCollection)
         {
-            if (filePath.Trim().Equals(string.Empty))
-                throw new ArgumentException("File path is empty", nameof(filePath));
-
             FilePath = filePath;
         }
     }
