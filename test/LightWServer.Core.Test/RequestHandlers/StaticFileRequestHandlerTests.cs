@@ -1,7 +1,8 @@
-﻿using AutoFixture;
-using LightWServer.Core.HttpContext;
+﻿using LightWServer.Core.HttpContext;
 using LightWServer.Core.HttpContext.Responses;
 using LightWServer.Core.RequestHandlers;
+using LightWServer.Core.Services.FileOperation;
+using Moq;
 using System.Net;
 using Xunit;
 
@@ -9,10 +10,11 @@ namespace LightWServer.Core.Test.RequestHandlers
 {
     public class StaticFileRequestHandlerTests
     {
-        [Fact]
-        public void Constructor_If_Invalid_Path_Then_Throw_Exception()
+        private Mock<IFileOperationService> fileOperationService;
+
+        public StaticFileRequestHandlerTests()
         {
-            Assert.Throws<ArgumentException>(() => new StaticFileRequestHandler(""));
+            fileOperationService = new Mock<IFileOperationService>();
         }
 
         [Theory]
@@ -32,19 +34,19 @@ namespace LightWServer.Core.Test.RequestHandlers
             const string RootPath = "Files";
 
             var fileName = $"Test{extension}";
-            var content = new Fixture().Create<string>();
-
-            using var tempFileCreator = new TempFileCreator(RootPath, fileName, content);
-
-            var fileInfo = new FileInfo(tempFileCreator.FullPath);
+            var fullPath = Path.Combine(RootPath, fileName);
+            var fileInfo = new FileInformation(1, extension);
             var expectedHeaders = CreateHeaderCollection(fileInfo.Length, expectedContentType);
 
-            var underTest = new StaticFileRequestHandler(RootPath);
+            fileOperationService.Setup(s => s.Exists(fullPath)).Returns(true);
+            fileOperationService.Setup(s => s.GetFileInfo(fullPath)).Returns(fileInfo);
+
+            var underTest = new StaticFileRequestHandler(RootPath, fileOperationService.Object);
             var response = underTest.Handle(new Request("1.1", fileName, HttpMethod.Get, HeaderCollection.CreateForRequest())) as FileResponse;
 
             Assert.NotNull(response);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal(Path.Combine(RootPath, fileName), response.FilePath);
+            Assert.Equal(fullPath, response.FilePath);
             Assert.Equal(expectedHeaders.GetHeadersNames(), response.Headers.GetHeadersNames());
             Assert.Equal(expectedHeaders, response.Headers);
         }
@@ -56,7 +58,9 @@ namespace LightWServer.Core.Test.RequestHandlers
 
             var fileName = "Test.txt";
 
-            var underTest = new StaticFileRequestHandler(RootPath);
+            fileOperationService.Setup(s => s.Exists(fileName)).Returns(false);
+
+            var underTest = new StaticFileRequestHandler(RootPath, fileOperationService.Object);
             var response = underTest.Handle(new Request("1.1", fileName, HttpMethod.Get, HeaderCollection.CreateForRequest()));
 
             Assert.NotNull(response);

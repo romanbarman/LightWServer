@@ -1,13 +1,24 @@
 ﻿using LightWServer.Core.Logging;
 using LightWServer.Core.RequestHandlers;
+using LightWServer.Core.Services.FileOperation;
 
 namespace LightWServer.Core
 {
     public sealed class ServerBuilder
     {
-        private int port = 80;
-        private StaticFileRequestHandler staticFileRequestHandler = new StaticFileRequestHandler("www");
-        private ILog log = new SimpleConsoleLog();
+        private readonly IFileOperationService fileOperationService;
+
+        private int port;
+        private StaticFileRequestHandler staticFileRequestHandler;
+        private ILog log;
+
+        public ServerBuilder()
+        {
+            fileOperationService = new FileOperationService();
+            port = 80;
+            staticFileRequestHandler = new StaticFileRequestHandler("www", fileOperationService);
+            log = new SimpleConsoleLog();
+        }
 
         public ServerBuilder SetPort(int port)
         {
@@ -27,7 +38,7 @@ namespace LightWServer.Core
             if (path.Trim().Equals(string.Empty))
                 throw new ArgumentException("Path is empty", nameof(path));
 
-            staticFileRequestHandler = new StaticFileRequestHandler(path);
+            staticFileRequestHandler = new StaticFileRequestHandler(path, fileOperationService);
 
             return this;
         }

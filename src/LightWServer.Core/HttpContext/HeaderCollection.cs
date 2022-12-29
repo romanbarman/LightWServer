@@ -3,6 +3,7 @@ using System.Collections;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("LightWServer.Core.Test")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace LightWServer.Core.HttpContext
 {
