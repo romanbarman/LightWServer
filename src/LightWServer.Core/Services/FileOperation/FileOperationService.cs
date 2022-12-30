@@ -10,5 +10,7 @@
 
             return new FileInformation(fileInfo.Length, fileInfo.Extension);
         }
+
+        public Stream OpenRead(string path) => File.OpenRead(path);
     }
 }

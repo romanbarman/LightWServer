@@ -16,15 +16,17 @@ namespace LightWServer.Core
 
         private readonly IExceptionToResponseMapper exceptionToResponseMapper;
         private readonly IRequestReader requestReader;
+        private readonly IResponseWriter responseWriter;
         private readonly IRequestHandler handler;
         private readonly ILog log;
         private readonly int port;
 
         internal LightWServerHost(IExceptionToResponseMapper exceptionToResponseMapper, IRequestReader requestReader,
-            IRequestHandler handler, ILog log, int port)
+            IResponseWriter responseWriter, IRequestHandler handler, ILog log, int port)
         {
             this.exceptionToResponseMapper = exceptionToResponseMapper;
             this.requestReader = requestReader;
+            this.responseWriter = responseWriter;
             this.handler = handler;
             this.log = log;
 
@@ -60,7 +62,7 @@ namespace LightWServer.Core
 
                     response = handler.Handle(request);
 
-                    await ResponseWriter.WriteResponse(response, networkStream);
+                    await responseWriter.WriteAsync(response, networkStream);
                 }
                 catch(Exception ex)
                 {
@@ -68,7 +70,7 @@ namespace LightWServer.Core
 
                     if (networkStream != null && networkStream.CanWrite)
                     {
-                        await ResponseWriter.WriteResponse(response, networkStream);
+                        await responseWriter.WriteAsync(response, networkStream);
                     }
 
                     log.Log(LogLevel.Error,

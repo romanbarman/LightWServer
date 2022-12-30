@@ -54,7 +54,8 @@ namespace LightWServer.Core
 
         public LightWServerHost Build()
         {
-            return new LightWServerHost(new ExceptionToResponseMapper(), new RequestReader(), staticFileRequestHandler, log, port);
+            return new LightWServerHost(new ExceptionToResponseMapper(), new RequestReader(), new ResponseWriter(fileOperationService),
+                staticFileRequestHandler, log, port);
         }
     }
 }

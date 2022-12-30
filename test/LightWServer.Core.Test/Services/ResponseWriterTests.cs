@@ -1,22 +1,35 @@
-﻿using AutoFixture;
+﻿using LightWServer.Core.HttpContext.Responses;
 using LightWServer.Core.HttpContext;
-using LightWServer.Core.HttpContext.Responses;
-using LightWServer.Core.Utils;
+using LightWServer.Core.Services;
 using System.Net;
 using System.Text;
 using Xunit;
+using Moq;
+using LightWServer.Core.Services.FileOperation;
+using AutoFixture;
 
-namespace LightWServer.Core.Test.Utils
+namespace LightWServer.Core.Test.Services
 {
     public class ResponseWriterTests
     {
+        private Mock<IFileOperationService> fileOperationService;
+
+        private ResponseWriter underTest;
+
+        public ResponseWriterTests()
+        {
+            fileOperationService = new Mock<IFileOperationService>();
+
+            underTest = new ResponseWriter(fileOperationService.Object);
+        }
+
         [Theory]
         [MemberData(nameof(Data))]
         public async Task WriteResponse_Should_Write_Response(object response, string expectedResult)
         {
             using var memoryStream = new MemoryStream();
 
-            await ResponseWriter.WriteResponse((Response)response, memoryStream);
+            await underTest.WriteAsync((Response)response, memoryStream);
 
             var result = Encoding.UTF8.GetString(memoryStream.ToArray());
 
@@ -26,20 +39,16 @@ namespace LightWServer.Core.Test.Utils
         [Fact]
         public async Task WriteResponse_Should_Write_FileResponse()
         {
-            const string RootPath = "Files";
-
-            var fileName = $"Test.txt";
+            var fullPath = Path.Combine("Files", "Test.txt");
             var content = new Fixture().Create<string>();
-
-            var response = new FileResponse(HttpStatusCode.OK, HeaderCollection.CreateForResponse(), Path.Combine(RootPath, fileName));
+            var response = new FileResponse(HttpStatusCode.OK, HeaderCollection.CreateForResponse(), fullPath);
             var expectedResult = $"HTTP/1.0 200 OK{Environment.NewLine}" +
                 $"Server: LightWServer/0.0.01{Environment.NewLine}{Environment.NewLine}{content}";
 
-            using var tempFileCreator = new TempFileCreator(RootPath, fileName, content);
+            fileOperationService.Setup(s => s.OpenRead(fullPath)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(content)));
+
             using var memoryStream = new MemoryStream();
-
-            await ResponseWriter.WriteResponse(response, memoryStream);
-
+            await underTest.WriteAsync(response, memoryStream);
             var result = Encoding.UTF8.GetString(memoryStream.ToArray());
 
             Assert.Equal(expectedResult, result);

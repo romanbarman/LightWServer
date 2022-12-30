@@ -4,5 +4,6 @@
     {
         bool Exists(string path);
         FileInformation GetFileInfo(string path);
+        Stream OpenRead(string path);
     }
 }

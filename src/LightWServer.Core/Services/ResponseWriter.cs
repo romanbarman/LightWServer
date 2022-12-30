@@ -1,11 +1,19 @@
 ﻿using LightWServer.Core.HttpContext;
 using LightWServer.Core.HttpContext.Responses;
+using LightWServer.Core.Services.FileOperation;
 
-namespace LightWServer.Core.Utils
+namespace LightWServer.Core.Services
 {
-    internal static class ResponseWriter
+    internal sealed class ResponseWriter : IResponseWriter
     {
-        internal static async Task WriteResponse(Response response, Stream networkStream)
+        private readonly IFileOperationService fileOperationService;
+
+        internal ResponseWriter(IFileOperationService fileOperationService)
+        {
+            this.fileOperationService = fileOperationService;
+        }
+
+        public async Task WriteAsync(Response response, Stream networkStream)
         {
             using (var writer = new StreamWriter(networkStream, leaveOpen: true))
             {
@@ -21,7 +29,7 @@ namespace LightWServer.Core.Utils
 
             if (response is FileResponse fileResponse)
             {
-                using (var fileStream = File.OpenRead(fileResponse.FilePath))
+                using (var fileStream = fileOperationService.OpenRead(fileResponse.FilePath))
                 {
                     await fileStream.CopyToAsync(networkStream);
                 }
