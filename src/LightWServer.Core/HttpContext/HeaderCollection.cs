@@ -13,9 +13,9 @@ namespace LightWServer.Core.HttpContext
 
         private HeaderCollection() { }
 
-        public void Add(string name, string value)
+        public void Add(Header header)
         {
-            headers[name] = new Header(name, value);
+            headers[header.Name] = header;
         }
 
         public bool Contains(string name) => headers.ContainsKey(name);
@@ -39,7 +39,7 @@ namespace LightWServer.Core.HttpContext
         internal static HeaderCollection CreateForResponse()
         {
             var headerCollection = new HeaderCollection();
-            headerCollection.Add("Server", "LightWServer/0.0.01");
+            headerCollection.Add(new Header("Server", "LightWServer/0.0.01"));
 
             return headerCollection;
         }

@@ -30,9 +30,9 @@ namespace LightWServer.Core.RequestHandlers
             var fileInfo = fileOperationService.GetFileInfo(filePath);
 
             var headerCollection = HeaderCollection.CreateForResponse();
-            headerCollection.Add("Accept-Ranges", "bytes");
-            headerCollection.Add("Content-Length", fileInfo.Length.ToString());
-            headerCollection.Add("Content-Type", GetContentType(fileInfo.Extension));
+            headerCollection.Add(new Header("Accept-Ranges", "bytes"));
+            headerCollection.Add(new Header("Content-Length", fileInfo.Length.ToString()));
+            headerCollection.Add(new Header("Content-Type", GetContentType(fileInfo.Extension)));
 
             return new FileResponse(HttpStatusCode.OK, headerCollection, filePath);
         }

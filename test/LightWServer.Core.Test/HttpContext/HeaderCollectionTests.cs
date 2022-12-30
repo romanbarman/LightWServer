@@ -12,8 +12,8 @@ namespace LightWServer.Core.Test.HttpContext
         {
             var underTest = HeaderCollection.CreateForRequest();
 
-            underTest.Add(key, value1);
-            underTest.Add(key, value2);
+            underTest.Add(new Header(key, value1));
+            underTest.Add(new Header(key, value2));
 
             Assert.Equal(value2, underTest.GetValue(key));
         }
@@ -23,8 +23,8 @@ namespace LightWServer.Core.Test.HttpContext
         {
             var underTest = HeaderCollection.CreateForRequest();
 
-            underTest.Add(key.ToLower(), value1);
-            underTest.Add(key, value2);
+            underTest.Add(new Header(key.ToLower(), value1));
+            underTest.Add(new Header(key, value2));
 
             Assert.Equal(value2, underTest.GetValue(key.ToUpper()));
         }
@@ -33,8 +33,8 @@ namespace LightWServer.Core.Test.HttpContext
         public void Contains_If_Key_Exist_Then_True(KeyValuePair<string, string> header1, KeyValuePair<string, string> header2)
         {
             var underTest = HeaderCollection.CreateForRequest();
-            underTest.Add(header1.Key, header1.Value);
-            underTest.Add(header2.Key, header2.Value);
+            underTest.Add(new Header(header1.Key, header1.Value));
+            underTest.Add(new Header(header2.Key, header2.Value));
 
             Assert.True(underTest.Contains(header1.Key));
         }
@@ -43,7 +43,7 @@ namespace LightWServer.Core.Test.HttpContext
         public void Contains_If_Key_Not_Exist_Then_False(KeyValuePair<string, string> header, string keyForSearch)
         {
             var underTest = HeaderCollection.CreateForRequest();
-            underTest.Add(header.Key, header.Value);
+            underTest.Add(new Header(header.Key, header.Value));
 
             Assert.False(underTest.Contains(keyForSearch));
         }
@@ -52,8 +52,8 @@ namespace LightWServer.Core.Test.HttpContext
         public void Contains_If_Key_Another_Case_Exist_Then_True(KeyValuePair<string, string> header1, KeyValuePair<string, string> header2)
         {
             var underTest = HeaderCollection.CreateForRequest();
-            underTest.Add(header1.Key, header1.Value);
-            underTest.Add(header2.Key, header2.Value);
+            underTest.Add(new Header(header1.Key, header1.Value));
+            underTest.Add(new Header(header2.Key, header2.Value));
 
             Assert.True(underTest.Contains(header1.Key.ToLower()));
         }
@@ -72,7 +72,7 @@ namespace LightWServer.Core.Test.HttpContext
             var underTest = HeaderCollection.CreateForRequest();
 
             foreach (var header in headers)
-                underTest.Add(header.Key, header.Value);
+                underTest.Add(new Header(header.Key, header.Value));
 
             Assert.Equal(headers.Keys, underTest.GetHeadersNames());
         }
@@ -83,7 +83,7 @@ namespace LightWServer.Core.Test.HttpContext
             var underTest = HeaderCollection.CreateForRequest();
 
             foreach (var header in headers)
-                underTest.Add(header.Key, header.Value);
+                underTest.Add(new Header(header.Key, header.Value));
 
             Assert.Throws<HeaderNotExistException>(() => underTest.GetValue(key));
         }
@@ -114,7 +114,7 @@ namespace LightWServer.Core.Test.HttpContext
             var underTest = HeaderCollection.CreateForRequest();
 
             foreach (var header in headers)
-                underTest.Add(header.Key, header.Value);
+                underTest.Add(new Header(header.Key, header.Value));
 
             var result = underTest.GetEnumerator();
 

@@ -2,7 +2,7 @@
 {
     internal interface IHeaderCollection : IEnumerable<Header>
     {
-        void Add(string name, string value);
+        void Add(Header header);
         bool Contains(string name);
         string GetValue(string name);
         IEnumerable<string> GetHeadersNames();

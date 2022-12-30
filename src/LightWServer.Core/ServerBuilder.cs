@@ -1,5 +1,6 @@
 ﻿using LightWServer.Core.Logging;
 using LightWServer.Core.RequestHandlers;
+using LightWServer.Core.Services;
 using LightWServer.Core.Services.FileOperation;
 using LightWServer.Core.Services.Mappers;
 
@@ -53,7 +54,7 @@ namespace LightWServer.Core
 
         public LightWServerHost Build()
         {
-            return new LightWServerHost(new ExceptionToResponseMapper(), staticFileRequestHandler, log, port);
+            return new LightWServerHost(new ExceptionToResponseMapper(), new RequestReader(), staticFileRequestHandler, log, port);
         }
     }
 }

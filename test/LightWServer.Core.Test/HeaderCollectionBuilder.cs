@@ -10,7 +10,7 @@ namespace LightWServer.Core.Test
 
             foreach (var header in headers)
             {
-                headerCollection.Add(header.Name, header.Value);
+                headerCollection.Add(header);
             }
 
             return headerCollection;

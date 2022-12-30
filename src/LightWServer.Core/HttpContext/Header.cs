@@ -1,7 +1,11 @@
-﻿namespace LightWServer.Core.HttpContext
+﻿using LightWServer.Core.Exceptions;
+
+namespace LightWServer.Core.HttpContext
 {
     internal sealed class Header : IEquatable<Header>
     {
+        private const string HeaderSeparator = ": ";
+
         internal string Name { get; }
         internal string Value { get; }
 
@@ -35,6 +39,22 @@
         public override int GetHashCode()
         {
             return HashCode.Combine(Name.ToLower(), Value.ToLower());
+        }
+
+        internal static Header Parse(string header)
+        {
+            var index = header.IndexOf(HeaderSeparator);
+
+            if (index == -1)
+                throw new InvalidHeaderFormatException(header);
+
+            var name = header.Substring(0, index).Trim();
+            var value = header.Substring(index + HeaderSeparator.Length).Trim();
+
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(value))
+                throw new InvalidHeaderFormatException(header);
+
+            return new Header(name, value);
         }
     }
 }

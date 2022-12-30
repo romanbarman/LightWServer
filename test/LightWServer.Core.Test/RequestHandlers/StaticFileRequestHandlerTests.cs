@@ -72,9 +72,9 @@ namespace LightWServer.Core.Test.RequestHandlers
         private static HeaderCollection CreateHeaderCollection(long contentLength, string contentType)
         {
             var headerCollection = HeaderCollection.CreateForResponse();
-            headerCollection.Add("Accept-Ranges", "bytes");
-            headerCollection.Add("Content-Length", contentLength.ToString());
-            headerCollection.Add("Content-Type", contentType);
+            headerCollection.Add(new Header("Accept-Ranges", "bytes"));
+            headerCollection.Add(new Header("Content-Length", contentLength.ToString()));
+            headerCollection.Add(new Header("Content-Type", contentType));
 
             return headerCollection;
         }
