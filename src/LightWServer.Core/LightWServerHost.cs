@@ -29,10 +29,6 @@ namespace LightWServer.Core
             this.responseWriter = responseWriter;
             this.handler = handler;
             this.log = log;
-
-            if (port < 1)
-                throw new ArgumentException("Invalid port", nameof(port));
-
             this.port = port;
         }
 
@@ -94,7 +90,7 @@ namespace LightWServer.Core
             var resultMessage = new StringBuilder();
             resultMessage.Append($"{request.HttpMethod} {request.Path}. ");
 
-            var headerInfo = string.Join("|", HeadersFilter.Filter(request).Select(x => $"{x.Name}:{x.Value}"));
+            var headerInfo = string.Join("|", HeadersFilter.Filter(request).Select(x => x.ToString()));
             resultMessage.Append($"{headerInfo}. ");
 
             resultMessage.Append($"{(int)response.StatusCode} {response.StatusCode}");

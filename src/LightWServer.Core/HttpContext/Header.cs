@@ -41,6 +41,11 @@ namespace LightWServer.Core.HttpContext
             return HashCode.Combine(Name.ToLower(), Value.ToLower());
         }
 
+        public override string ToString()
+        {
+            return $"{Name}: {Value}";
+        }
+
         internal static Header Parse(string header)
         {
             var index = header.IndexOf(HeaderSeparator);
