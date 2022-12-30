@@ -2,7 +2,7 @@
 
 namespace LightWServer.Core.HttpContext
 {
-    public class Response
+    internal class Response
     {
         internal HttpStatusCode StatusCode { get; }
         internal IHeaderCollection Headers { get; }

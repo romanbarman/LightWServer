@@ -1,12 +1,7 @@
-﻿using System.Runtime.Serialization;
-
-namespace LightWServer.Core.Exceptions
+﻿namespace LightWServer.Core.Exceptions
 {
-    [Serializable]
-    internal sealed class InvalidRequestException : Exception
+    internal sealed class InvalidRequestException : ServerException
     {
-        internal InvalidRequestException(string message) : base(message) { }
-        internal InvalidRequestException(string message, Exception innerException) : base(message, innerException) { }
-        internal InvalidRequestException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        internal InvalidRequestException(string message) : base($"{message.TrimEnd('.')}.") { }
     }
 }

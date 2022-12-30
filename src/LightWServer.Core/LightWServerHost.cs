@@ -1,6 +1,8 @@
 ﻿using LightWServer.Core.HttpContext;
 using LightWServer.Core.Logging;
 using LightWServer.Core.RequestHandlers;
+using LightWServer.Core.Services;
+using LightWServer.Core.Services.Mappers;
 using LightWServer.Core.Utils;
 using System.Net;
 using System.Net.Sockets;
@@ -12,18 +14,21 @@ namespace LightWServer.Core
     {
         private const string UnexpectedErrorMessage = "Unexpected error";
 
+        private readonly IExceptionToResponseMapper exceptionToResponseMapper;
+        private readonly IRequestReader requestReader;
+        private readonly IResponseWriter responseWriter;
         private readonly IRequestHandler handler;
         private readonly ILog log;
         private readonly int port;
 
-        internal LightWServerHost(IRequestHandler handler, ILog log, int port)
+        internal LightWServerHost(IExceptionToResponseMapper exceptionToResponseMapper, IRequestReader requestReader,
+            IResponseWriter responseWriter, IRequestHandler handler, ILog log, int port)
         {
+            this.exceptionToResponseMapper = exceptionToResponseMapper;
+            this.requestReader = requestReader;
+            this.responseWriter = responseWriter;
             this.handler = handler;
             this.log = log;
-
-            if (port < 1)
-                throw new ArgumentException("Invalid port", nameof(port));
-
             this.port = port;
         }
 
@@ -49,19 +54,19 @@ namespace LightWServer.Core
 
                 try
                 {
-                    request = await RequestParser.ReadAsync(networkStream);
+                    request = await requestReader.ReadAsync(networkStream);
 
                     response = handler.Handle(request);
 
-                    await ResponseWriter.WriteResponse(response, networkStream);
+                    await responseWriter.WriteAsync(response, networkStream);
                 }
                 catch(Exception ex)
                 {
-                    response = ExceptionUtil.ExceptionToResponse(ex);
+                    response = exceptionToResponseMapper.Map(ex);
 
                     if (networkStream != null && networkStream.CanWrite)
                     {
-                        await ResponseWriter.WriteResponse(response, networkStream);
+                        await responseWriter.WriteAsync(response, networkStream);
                     }
 
                     log.Log(LogLevel.Error,
@@ -85,7 +90,7 @@ namespace LightWServer.Core
             var resultMessage = new StringBuilder();
             resultMessage.Append($"{request.HttpMethod} {request.Path}. ");
 
-            var headerInfo = string.Join("|", HeadersFilter.Filter(request).Select(x => $"{x.Key}:{x.Value}"));
+            var headerInfo = string.Join("|", HeadersFilter.Filter(request).Select(x => x.ToString()));
             resultMessage.Append($"{headerInfo}. ");
 
             resultMessage.Append($"{(int)response.StatusCode} {response.StatusCode}");

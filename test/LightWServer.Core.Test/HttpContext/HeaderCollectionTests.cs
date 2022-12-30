@@ -1,4 +1,5 @@
 ﻿using AutoFixture.Xunit2;
+using LightWServer.Core.Exceptions;
 using LightWServer.Core.HttpContext;
 using Xunit;
 
@@ -6,138 +7,112 @@ namespace LightWServer.Core.Test.HttpContext
 {
     public class HeaderCollectionTests
     {
-        [Theory, AutoData]
-        public void Add_If_Invalid_Key_Then_Throw_Exception(string value)
+        private HeaderCollection underTest;
+
+        public HeaderCollectionTests()
         {
-            var underTest = new HeaderCollection();
-
-            Assert.Throws<ArgumentException>(() => underTest.Add("", value));
-        }
-
-        [Theory, AutoData]
-        public void Add_If_Invalid_Value_Then_Throw_Exception(string key)
-        {
-            var underTest = new HeaderCollection();
-
-            Assert.Throws<ArgumentException>(() => underTest.Add(key, ""));
+            underTest = HeaderCollection.CreateForRequest();
         }
 
         [Theory, AutoData]
         public void Add_If_Same_Key_Then_Last_Value(string key, string value1, string value2)
         {
-            var underTest = new HeaderCollection();
+            var header1 = new Header(key, value1);
+            var header2 = new Header(key, value2);
 
-            underTest.Add(key, value1);
-            underTest.Add(key, value2);
+            underTest.Add(header1);
+            underTest.Add(header2);
 
-            Assert.Equal(value2, underTest.GetValue(key));
+            Assert.Equal(header2, underTest.Get(key));
         }
 
         [Theory, AutoData]
         public void Add_If_Same_Key_With_Different_Register_Then_Last_Value(string key, string value1, string value2)
         {
-            var underTest = new HeaderCollection();
+            var header1 = new Header(key.ToLower(), value1);
+            var header2 = new Header(key, value2);
 
-            underTest.Add(key.ToLower(), value1);
-            underTest.Add(key, value2);
+            underTest.Add(header1);
+            underTest.Add(header2);
 
-            Assert.Equal(value2, underTest.GetValue(key.ToUpper()));
+            Assert.Equal(header2, underTest.Get(key.ToUpper()));
+        }
+
+        [Theory, AutoData]
+        public void Contains_If_Key_Exist_Then_True(KeyValuePair<string, string> header1, KeyValuePair<string, string> header2)
+        {
+            underTest.Add(new Header(header1.Key, header1.Value));
+            underTest.Add(new Header(header2.Key, header2.Value));
+
+            Assert.True(underTest.Contains(header1.Key));
+        }
+
+        [Theory, AutoData]
+        public void Contains_If_Key_Not_Exist_Then_False(KeyValuePair<string, string> header, string keyForSearch)
+        {
+            underTest.Add(new Header(header.Key, header.Value));
+
+            Assert.False(underTest.Contains(keyForSearch));
+        }
+
+        [Theory, AutoData]
+        public void Contains_If_Key_Another_Case_Exist_Then_True(KeyValuePair<string, string> header1, KeyValuePair<string, string> header2)
+        {
+            underTest.Add(new Header(header1.Key, header1.Value));
+            underTest.Add(new Header(header2.Key, header2.Value));
+
+            Assert.True(underTest.Contains(header1.Key.ToLower()));
         }
 
         [Fact]
-        public void ContainsKey_If_Invalid_Key_Then_Throw_Exception()
+        public void GetHeadersNames_If_No_Headers_Then_Empty()
         {
-            var underTest = new HeaderCollection();
-
-            Assert.Throws<ArgumentException>(() => underTest.ContainsKey(""));
+            Assert.False(underTest.GetHeadersNames().Any());
         }
 
         [Theory, AutoData]
-        public void ContainsKey_If_Key_Exist_Then_True(KeyValuePair<string, string> header1, KeyValuePair<string, string> header2)
+        public void GetHeadersNames_If_Headers_Exists_Then_Return_All_Keys(Dictionary<string, string> headers)
         {
-            var underTest = new HeaderCollection();
-            underTest.Add(header1.Key, header1.Value);
-            underTest.Add(header2.Key, header2.Value);
-
-            Assert.True(underTest.ContainsKey(header1.Key));
-        }
-
-        [Theory, AutoData]
-        public void ContainsKey_If_Key_Not_Exist_Then_False(KeyValuePair<string, string> header, string keyForSearch)
-        {
-            var underTest = new HeaderCollection();
-            underTest.Add(header.Key, header.Value);
-
-            Assert.False(underTest.ContainsKey(keyForSearch));
-        }
-
-        [Theory, AutoData]
-        public void ContainsKey_If_Key_Another_Case_Exist_Then_True(KeyValuePair<string, string> header1, KeyValuePair<string, string> header2)
-        {
-            var underTest = new HeaderCollection();
-            underTest.Add(header1.Key, header1.Value);
-            underTest.Add(header2.Key, header2.Value);
-
-            Assert.True(underTest.ContainsKey(header1.Key.ToLower()));
-        }
-
-        [Fact]
-        public void GetKeys_If_No_Headers_Then_Empty()
-        {
-            var underTest = new HeaderCollection();
-
-            Assert.False(underTest.GetKeys().Any());
-        }
-
-        [Theory, AutoData]
-        public void GetKeys_If_Headers_Exists_Then_Return_All_Keys(Dictionary<string, string> headers)
-        {
-            var underTest = new HeaderCollection();
-
             foreach (var header in headers)
-                underTest.Add(header.Key, header.Value);
+                underTest.Add(new Header(header.Key, header.Value));
 
-            Assert.Equal(headers.Keys, underTest.GetKeys());
-        }
-
-        [Fact]
-        public void GetValue_If_Invalid_Key_Then_Throw_Exception()
-        {
-            var underTest = new HeaderCollection();
-
-            Assert.Throws<ArgumentException>(() => underTest.GetValue(""));
+            Assert.Equal(headers.Keys, underTest.GetHeadersNames());
         }
 
         [Theory, AutoData]
-        public void GetValue_If_Header_Not_Exists_Then_Throw_Exception(Dictionary<string, string> headers, string key)
+        public void Get_If_Header_Not_Exists_Then_Throw_Exception(Dictionary<string, string> headers, string key)
         {
-            var underTest = new HeaderCollection();
-
             foreach (var header in headers)
-                underTest.Add(header.Key, header.Value);
+                underTest.Add(new Header(header.Key, header.Value));
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => underTest.GetValue(key));
+            Assert.Throws<HeaderNotExistException>(() => underTest.Get(key));
         }
 
         [Fact]
         public void CreateForResponse_Should_Return_With_Header()
         {
-            const string Header = "Server";
+            var header = new Header("Server", "LightWServer/0.0.01");
 
             var result = HeaderCollection.CreateForResponse();
 
-            Assert.Single(result.GetKeys());
-            Assert.True(result.ContainsKey(Header));
-            Assert.Equal("LightWServer/0.0.01", result.GetValue(Header));
+            Assert.Single(result.GetHeadersNames());
+            Assert.True(result.Contains(header.Name));
+            Assert.Equal(header, result.Get(header.Name));
+        }
+
+        [Fact]
+        public void CreateForRequest_Should_Return_Without_Headers()
+        {
+            var result = HeaderCollection.CreateForRequest();
+
+            Assert.Empty(result.GetHeadersNames());
         }
 
         [Theory, AutoData]
         public void GetEnumerator_Should_Return_Values(Dictionary<string, string> headers)
         {
-            var underTest = new HeaderCollection();
-
             foreach (var header in headers)
-                underTest.Add(header.Key, header.Value);
+                underTest.Add(new Header(header.Key, header.Value));
 
             var result = underTest.GetEnumerator();
 
@@ -145,8 +120,8 @@ namespace LightWServer.Core.Test.HttpContext
             {
                 var current = result.Current;
 
-                Assert.True(headers.ContainsKey(current.Key));
-                Assert.Equal(headers[current.Key], current.Value);
+                Assert.True(headers.ContainsKey(current.Name));
+                Assert.Equal(headers[current.Name], current.Value);
             }
         }
     }

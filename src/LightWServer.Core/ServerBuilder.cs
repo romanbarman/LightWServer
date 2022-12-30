@@ -1,18 +1,31 @@
 ﻿using LightWServer.Core.Logging;
 using LightWServer.Core.RequestHandlers;
+using LightWServer.Core.Services;
+using LightWServer.Core.Services.FileOperation;
+using LightWServer.Core.Services.Mappers;
 
 namespace LightWServer.Core
 {
     public sealed class ServerBuilder
     {
-        private int port = 80;
-        private StaticFileRequestHandler staticFileRequestHandler = new StaticFileRequestHandler("www");
-        private ILog log = new SimpleConsoleLog();
+        private readonly IFileOperationService fileOperationService;
+
+        private int port;
+        private StaticFileRequestHandler staticFileRequestHandler;
+        private ILog log;
+
+        public ServerBuilder()
+        {
+            fileOperationService = new FileOperationService();
+            port = 80;
+            staticFileRequestHandler = new StaticFileRequestHandler("www", fileOperationService);
+            log = new SimpleConsoleLog();
+        }
 
         public ServerBuilder SetPort(int port)
         {
             if (port < 1)
-                throw new ArgumentException("Invalid port", nameof(port));
+                throw new ArgumentException("Invalid port.", nameof(port));
 
             this.port = port;
 
@@ -25,9 +38,9 @@ namespace LightWServer.Core
                 throw new ArgumentNullException(nameof(path));
 
             if (path.Trim().Equals(string.Empty))
-                throw new ArgumentException("Path is empty", nameof(path));
+                throw new ArgumentException("Path is empty.", nameof(path));
 
-            staticFileRequestHandler = new StaticFileRequestHandler(path);
+            staticFileRequestHandler = new StaticFileRequestHandler(path, fileOperationService);
 
             return this;
         }
@@ -41,7 +54,8 @@ namespace LightWServer.Core
 
         public LightWServerHost Build()
         {
-            return new LightWServerHost(staticFileRequestHandler, log, port);
+            return new LightWServerHost(new ExceptionToResponseMapper(), new RequestReader(), new ResponseWriter(fileOperationService),
+                staticFileRequestHandler, log, port);
         }
     }
 }

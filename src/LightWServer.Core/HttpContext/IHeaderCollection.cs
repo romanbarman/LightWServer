@@ -1,12 +1,10 @@
-﻿using System.Collections;
-
-namespace LightWServer.Core.HttpContext
+﻿namespace LightWServer.Core.HttpContext
 {
-    internal interface IHeaderCollection : IEnumerable<KeyValuePair<string, string>>
+    internal interface IHeaderCollection : IEnumerable<Header>
     {
-        void Add(string key, string value);
-        bool ContainsKey(string key);
-        string GetValue(string key);
-        IEnumerable<string> GetKeys();
+        void Add(Header header);
+        bool Contains(string name);
+        Header Get(string name);
+        IEnumerable<string> GetHeadersNames();
     }
 }

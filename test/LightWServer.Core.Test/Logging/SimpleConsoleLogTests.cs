@@ -1,5 +1,4 @@
 ﻿using AutoFixture;
-using AutoFixture.Xunit2;
 using LightWServer.Core.Logging;
 using System.Globalization;
 using Xunit;
@@ -10,17 +9,13 @@ namespace LightWServer.Core.Test.Logging
     {
         private Fixture fixture;
 
+        private SimpleConsoleLog underTest;
+
         public SimpleConsoleLogTests()
         {
             fixture = new Fixture();
-        }
 
-        [Theory, AutoData]
-        public void Log_If_Invalid_Message_Then_Throw_Exception(LogLevel logLevel)
-        {
-            var underTest = new SimpleConsoleLog();
-
-            Assert.Throws<ArgumentException>(() => underTest.Log(logLevel, ""));
+            underTest = new SimpleConsoleLog();
         }
 
         [Theory]
@@ -31,7 +26,6 @@ namespace LightWServer.Core.Test.Logging
         [InlineData(LogLevel.Error)]
         public void Log_If_Valid_Message_Then_Write_To_Console(LogLevel logLevel)
         {
-            var underTest = new SimpleConsoleLog();
             var message = fixture.Create<string>();
 
             var output = new StringWriter();
@@ -47,14 +41,6 @@ namespace LightWServer.Core.Test.Logging
             Assert.InRange(date, DateTime.Now.AddSeconds(-5), DateTime.Now.AddSeconds(5));
         }
 
-        [Theory, AutoData]
-        public void Log_With_Exception_If_Invalid_Message_Then_Throw_Exception(LogLevel logLevel, Exception exception)
-        {
-            var underTest = new SimpleConsoleLog();
-
-            Assert.Throws<ArgumentException>(() => underTest.Log(logLevel, "", exception));
-        }
-
         [Theory]
         [InlineData(LogLevel.Trace)]
         [InlineData(LogLevel.Debug)]
@@ -63,7 +49,6 @@ namespace LightWServer.Core.Test.Logging
         [InlineData(LogLevel.Error)]
         public void Log_With_Exception_If_Valid_Message_Then_Write_To_Console(LogLevel logLevel)
         {
-            var underTest = new SimpleConsoleLog();
             var message = fixture.Create<string>();
             var exception = fixture.Create<Exception>();
 
