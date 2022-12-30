@@ -15,7 +15,7 @@ namespace LightWServer.Core.Test.HttpContext
             underTest.Add(new Header(key, value1));
             underTest.Add(new Header(key, value2));
 
-            Assert.Equal(value2, underTest.GetValue(key));
+            Assert.Equal(value2, underTest.Get(key).Value);
         }
 
         [Theory, AutoData]
@@ -26,7 +26,7 @@ namespace LightWServer.Core.Test.HttpContext
             underTest.Add(new Header(key.ToLower(), value1));
             underTest.Add(new Header(key, value2));
 
-            Assert.Equal(value2, underTest.GetValue(key.ToUpper()));
+            Assert.Equal(value2, underTest.Get(key.ToUpper()).Value);
         }
 
         [Theory, AutoData]
@@ -85,7 +85,7 @@ namespace LightWServer.Core.Test.HttpContext
             foreach (var header in headers)
                 underTest.Add(new Header(header.Key, header.Value));
 
-            Assert.Throws<HeaderNotExistException>(() => underTest.GetValue(key));
+            Assert.Throws<HeaderNotExistException>(() => underTest.Get(key));
         }
 
         [Fact]
@@ -97,7 +97,7 @@ namespace LightWServer.Core.Test.HttpContext
 
             Assert.Single(result.GetHeadersNames());
             Assert.True(result.Contains(Header));
-            Assert.Equal("LightWServer/0.0.01", result.GetValue(Header));
+            Assert.Equal("LightWServer/0.0.01", result.Get(Header).Value);
         }
 
         [Fact]

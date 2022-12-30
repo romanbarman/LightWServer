@@ -22,12 +22,12 @@ namespace LightWServer.Core.HttpContext
 
         public IEnumerable<string> GetHeadersNames() => headers.Keys;
 
-        public string GetValue(string name)
+        public Header Get(string name)
         {
             if (!headers.ContainsKey(name))
                 throw new HeaderNotExistException(name);
 
-            return headers[name].Value;
+            return headers[name];
         }
 
         public IEnumerator<Header> GetEnumerator() => headers.Select(x => x.Value).GetEnumerator();
