@@ -43,7 +43,7 @@ namespace LightWServer.Core.HttpContext
 
         public override string ToString()
         {
-            return $"{Name}: {Value}";
+            return $"{Name}{HeaderSeparator}{Value}";
         }
 
         internal static Header Parse(string header)
