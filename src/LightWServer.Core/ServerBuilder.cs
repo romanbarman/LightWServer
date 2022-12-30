@@ -25,7 +25,7 @@ namespace LightWServer.Core
         public ServerBuilder SetPort(int port)
         {
             if (port < 1)
-                throw new ArgumentException("Invalid port", nameof(port));
+                throw new ArgumentException("Invalid port.", nameof(port));
 
             this.port = port;
 
@@ -38,7 +38,7 @@ namespace LightWServer.Core
                 throw new ArgumentNullException(nameof(path));
 
             if (path.Trim().Equals(string.Empty))
-                throw new ArgumentException("Path is empty", nameof(path));
+                throw new ArgumentException("Path is empty.", nameof(path));
 
             staticFileRequestHandler = new StaticFileRequestHandler(path, fileOperationService);
 
