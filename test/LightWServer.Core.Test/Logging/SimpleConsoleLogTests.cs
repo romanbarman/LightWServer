@@ -9,9 +9,13 @@ namespace LightWServer.Core.Test.Logging
     {
         private Fixture fixture;
 
+        private SimpleConsoleLog underTest;
+
         public SimpleConsoleLogTests()
         {
             fixture = new Fixture();
+
+            underTest = new SimpleConsoleLog();
         }
 
         [Theory]
@@ -22,7 +26,6 @@ namespace LightWServer.Core.Test.Logging
         [InlineData(LogLevel.Error)]
         public void Log_If_Valid_Message_Then_Write_To_Console(LogLevel logLevel)
         {
-            var underTest = new SimpleConsoleLog();
             var message = fixture.Create<string>();
 
             var output = new StringWriter();
@@ -46,7 +49,6 @@ namespace LightWServer.Core.Test.Logging
         [InlineData(LogLevel.Error)]
         public void Log_With_Exception_If_Valid_Message_Then_Write_To_Console(LogLevel logLevel)
         {
-            var underTest = new SimpleConsoleLog();
             var message = fixture.Create<string>();
             var exception = fixture.Create<Exception>();
 

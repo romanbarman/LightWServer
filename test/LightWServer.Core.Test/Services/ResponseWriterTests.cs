@@ -34,6 +34,8 @@ namespace LightWServer.Core.Test.Services
             var result = Encoding.UTF8.GetString(memoryStream.ToArray());
 
             Assert.Equal(expectedResult, result);
+
+            fileOperationService.Verify();
         }
 
         [Fact]
@@ -52,6 +54,8 @@ namespace LightWServer.Core.Test.Services
             var result = Encoding.UTF8.GetString(memoryStream.ToArray());
 
             Assert.Equal(expectedResult, result);
+
+            fileOperationService.Verify();
         }
 
         public static IEnumerable<object[]> Data =>

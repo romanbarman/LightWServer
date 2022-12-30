@@ -49,6 +49,8 @@ namespace LightWServer.Core.Test.RequestHandlers
             Assert.Equal(fullPath, response.FilePath);
             Assert.Equal(expectedHeaders.GetHeadersNames(), response.Headers.GetHeadersNames());
             Assert.Equal(expectedHeaders, response.Headers);
+
+            fileOperationService.Verify();
         }
 
         [Fact]
@@ -67,6 +69,8 @@ namespace LightWServer.Core.Test.RequestHandlers
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Single(response.Headers.GetHeadersNames());
             Assert.Equal("Server", response.Headers.Single().Name);
+
+            fileOperationService.Verify();
         }
 
         private static HeaderCollection CreateHeaderCollection(long contentLength, string contentType)

@@ -7,32 +7,40 @@ namespace LightWServer.Core.Test.HttpContext
 {
     public class HeaderCollectionTests
     {
+        private HeaderCollection underTest;
+
+        public HeaderCollectionTests()
+        {
+            underTest = HeaderCollection.CreateForRequest();
+        }
+
         [Theory, AutoData]
         public void Add_If_Same_Key_Then_Last_Value(string key, string value1, string value2)
         {
-            var underTest = HeaderCollection.CreateForRequest();
+            var header1 = new Header(key, value1);
+            var header2 = new Header(key, value2);
 
-            underTest.Add(new Header(key, value1));
-            underTest.Add(new Header(key, value2));
+            underTest.Add(header1);
+            underTest.Add(header2);
 
-            Assert.Equal(value2, underTest.Get(key).Value);
+            Assert.Equal(header2, underTest.Get(key));
         }
 
         [Theory, AutoData]
         public void Add_If_Same_Key_With_Different_Register_Then_Last_Value(string key, string value1, string value2)
         {
-            var underTest = HeaderCollection.CreateForRequest();
+            var header1 = new Header(key.ToLower(), value1);
+            var header2 = new Header(key, value2);
 
-            underTest.Add(new Header(key.ToLower(), value1));
-            underTest.Add(new Header(key, value2));
+            underTest.Add(header1);
+            underTest.Add(header2);
 
-            Assert.Equal(value2, underTest.Get(key.ToUpper()).Value);
+            Assert.Equal(header2, underTest.Get(key.ToUpper()));
         }
 
         [Theory, AutoData]
         public void Contains_If_Key_Exist_Then_True(KeyValuePair<string, string> header1, KeyValuePair<string, string> header2)
         {
-            var underTest = HeaderCollection.CreateForRequest();
             underTest.Add(new Header(header1.Key, header1.Value));
             underTest.Add(new Header(header2.Key, header2.Value));
 
@@ -42,7 +50,6 @@ namespace LightWServer.Core.Test.HttpContext
         [Theory, AutoData]
         public void Contains_If_Key_Not_Exist_Then_False(KeyValuePair<string, string> header, string keyForSearch)
         {
-            var underTest = HeaderCollection.CreateForRequest();
             underTest.Add(new Header(header.Key, header.Value));
 
             Assert.False(underTest.Contains(keyForSearch));
@@ -51,7 +58,6 @@ namespace LightWServer.Core.Test.HttpContext
         [Theory, AutoData]
         public void Contains_If_Key_Another_Case_Exist_Then_True(KeyValuePair<string, string> header1, KeyValuePair<string, string> header2)
         {
-            var underTest = HeaderCollection.CreateForRequest();
             underTest.Add(new Header(header1.Key, header1.Value));
             underTest.Add(new Header(header2.Key, header2.Value));
 
@@ -61,16 +67,12 @@ namespace LightWServer.Core.Test.HttpContext
         [Fact]
         public void GetHeadersNames_If_No_Headers_Then_Empty()
         {
-            var underTest = HeaderCollection.CreateForRequest();
-
             Assert.False(underTest.GetHeadersNames().Any());
         }
 
         [Theory, AutoData]
         public void GetHeadersNames_If_Headers_Exists_Then_Return_All_Keys(Dictionary<string, string> headers)
         {
-            var underTest = HeaderCollection.CreateForRequest();
-
             foreach (var header in headers)
                 underTest.Add(new Header(header.Key, header.Value));
 
@@ -78,10 +80,8 @@ namespace LightWServer.Core.Test.HttpContext
         }
 
         [Theory, AutoData]
-        public void GetValue_If_Header_Not_Exists_Then_Throw_Exception(Dictionary<string, string> headers, string key)
+        public void Get_If_Header_Not_Exists_Then_Throw_Exception(Dictionary<string, string> headers, string key)
         {
-            var underTest = HeaderCollection.CreateForRequest();
-
             foreach (var header in headers)
                 underTest.Add(new Header(header.Key, header.Value));
 
@@ -91,13 +91,13 @@ namespace LightWServer.Core.Test.HttpContext
         [Fact]
         public void CreateForResponse_Should_Return_With_Header()
         {
-            const string Header = "Server";
+            var header = new Header("Server", "LightWServer/0.0.01");
 
             var result = HeaderCollection.CreateForResponse();
 
             Assert.Single(result.GetHeadersNames());
-            Assert.True(result.Contains(Header));
-            Assert.Equal("LightWServer/0.0.01", result.Get(Header).Value);
+            Assert.True(result.Contains(header.Name));
+            Assert.Equal(header, result.Get(header.Name));
         }
 
         [Fact]
@@ -111,8 +111,6 @@ namespace LightWServer.Core.Test.HttpContext
         [Theory, AutoData]
         public void GetEnumerator_Should_Return_Values(Dictionary<string, string> headers)
         {
-            var underTest = HeaderCollection.CreateForRequest();
-
             foreach (var header in headers)
                 underTest.Add(new Header(header.Key, header.Value));
 
