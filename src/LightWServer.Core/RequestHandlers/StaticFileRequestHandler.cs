@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using LightWServer.Core.HttpContext;
+using LightWServer.Core.HttpContext.Headers;
 using LightWServer.Core.HttpContext.Responses;
 using LightWServer.Core.Services.FileOperation;
 

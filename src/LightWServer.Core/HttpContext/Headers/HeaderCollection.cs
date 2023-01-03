@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("LightWServer.Core.Test")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
-namespace LightWServer.Core.HttpContext
+namespace LightWServer.Core.HttpContext.Headers
 {
     internal sealed class HeaderCollection : IHeaderCollection
     {
@@ -39,7 +39,7 @@ namespace LightWServer.Core.HttpContext
         internal static HeaderCollection CreateForResponse()
         {
             var headerCollection = new HeaderCollection();
-            headerCollection.Add(new Header("Server", "LightWServer/0.0.01"));
+            headerCollection.Add(new ServerHeader());
 
             return headerCollection;
         }

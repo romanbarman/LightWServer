@@ -1,4 +1,4 @@
-﻿using LightWServer.Core.HttpContext;
+﻿using LightWServer.Core.HttpContext.Headers;
 
 namespace LightWServer.Core.Test
 {

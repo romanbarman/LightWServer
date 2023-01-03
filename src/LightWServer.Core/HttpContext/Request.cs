@@ -1,4 +1,6 @@
-﻿namespace LightWServer.Core.HttpContext
+﻿using LightWServer.Core.HttpContext.Headers;
+
+namespace LightWServer.Core.HttpContext
 {
     internal sealed class Request
     {

@@ -1,5 +1,6 @@
 ﻿using LightWServer.Core.Exceptions;
 using LightWServer.Core.HttpContext;
+using LightWServer.Core.HttpContext.Headers;
 using System.Globalization;
 
 namespace LightWServer.Core.Services

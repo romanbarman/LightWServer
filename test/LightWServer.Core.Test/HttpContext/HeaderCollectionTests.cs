@@ -1,6 +1,6 @@
 ﻿using AutoFixture.Xunit2;
 using LightWServer.Core.Exceptions;
-using LightWServer.Core.HttpContext;
+using LightWServer.Core.HttpContext.Headers;
 using Xunit;
 
 namespace LightWServer.Core.Test.HttpContext
@@ -91,7 +91,7 @@ namespace LightWServer.Core.Test.HttpContext
         [Fact]
         public void CreateForResponse_Should_Return_With_Header()
         {
-            var header = new Header("Server", "LightWServer/0.0.01");
+            var header = new ServerHeader();
 
             var result = HeaderCollection.CreateForResponse();
 
