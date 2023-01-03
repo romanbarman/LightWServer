@@ -1,4 +1,5 @@
-﻿using LightWServer.Core.HttpContext;
+﻿using LightWServer.Core.Exceptions;
+using LightWServer.Core.HttpContext;
 using LightWServer.Core.Logging;
 using LightWServer.Core.RequestHandlers;
 using LightWServer.Core.Services;
@@ -59,6 +60,10 @@ namespace LightWServer.Core
                     response = handler.Handle(request);
 
                     await responseWriter.WriteAsync(response, networkStream);
+                }
+                catch(EmptyRequestException)
+                {
+                    return;
                 }
                 catch(Exception ex)
                 {
