@@ -1,6 +1,6 @@
 ﻿using AutoFixture.Xunit2;
 using LightWServer.Core.Exceptions;
-using LightWServer.Core.HttpContext;
+using LightWServer.Core.HttpContext.Headers;
 using Xunit;
 
 namespace LightWServer.Core.Test.HttpContext

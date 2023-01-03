@@ -1,5 +1,6 @@
 ﻿using LightWServer.Core.Exceptions;
 using LightWServer.Core.HttpContext;
+using LightWServer.Core.HttpContext.Headers;
 using System.Net;
 
 namespace LightWServer.Core.Services.Mappers

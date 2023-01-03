@@ -1,4 +1,4 @@
-﻿namespace LightWServer.Core.HttpContext
+﻿namespace LightWServer.Core.HttpContext.Headers
 {
     internal interface IHeaderCollection : IEnumerable<Header>
     {

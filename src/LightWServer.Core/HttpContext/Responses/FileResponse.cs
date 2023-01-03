@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using LightWServer.Core.HttpContext.Headers;
 
 namespace LightWServer.Core.HttpContext.Responses
 {

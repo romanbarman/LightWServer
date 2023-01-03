@@ -7,6 +7,7 @@ using Xunit;
 using Moq;
 using LightWServer.Core.Services.FileOperation;
 using AutoFixture;
+using LightWServer.Core.HttpContext.Headers;
 
 namespace LightWServer.Core.Test.Services
 {
@@ -44,8 +45,9 @@ namespace LightWServer.Core.Test.Services
             var fullPath = Path.Combine("Files", "Test.txt");
             var content = new Fixture().Create<string>();
             var response = new FileResponse(HttpStatusCode.OK, HeaderCollection.CreateForResponse(), fullPath);
+            var serverHeader = new ServerHeader();
             var expectedResult = $"HTTP/1.0 200 OK{Environment.NewLine}" +
-                $"Server: LightWServer/0.0.01{Environment.NewLine}{Environment.NewLine}{content}";
+                $"{serverHeader}{Environment.NewLine}{Environment.NewLine}{content}";
 
             fileOperationService.Setup(s => s.OpenRead(fullPath)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(content)));
 
@@ -64,12 +66,12 @@ namespace LightWServer.Core.Test.Services
             new object[]
             {
                 new Response(HttpStatusCode.OK, HeaderCollection.CreateForResponse()),
-                $"HTTP/1.0 200 OK{Environment.NewLine}Server: LightWServer/0.0.01{Environment.NewLine}{Environment.NewLine}"
+                $"HTTP/1.0 200 OK{Environment.NewLine}{new ServerHeader()}{Environment.NewLine}{Environment.NewLine}"
             },
             new object[]
             {
-                new Response(HttpStatusCode.Redirect, HeaderCollectionBuilder.Create(new Header("Server", "LightWServer/0.0.01"), new Header("Accept-Ranges", "bytes"))),
-                $"HTTP/1.0 302 Redirect{Environment.NewLine}Server: LightWServer/0.0.01{Environment.NewLine}Accept-Ranges: bytes{Environment.NewLine}{Environment.NewLine}"
+                new Response(HttpStatusCode.Redirect, HeaderCollectionBuilder.Create(new ServerHeader(), new Header("Accept-Ranges", "bytes"))),
+                $"HTTP/1.0 302 Redirect{Environment.NewLine}{new ServerHeader()}{Environment.NewLine}Accept-Ranges: bytes{Environment.NewLine}{Environment.NewLine}"
             }
         };
     }

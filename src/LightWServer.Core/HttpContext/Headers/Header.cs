@@ -1,8 +1,8 @@
 ﻿using LightWServer.Core.Exceptions;
 
-namespace LightWServer.Core.HttpContext
+namespace LightWServer.Core.HttpContext.Headers
 {
-    internal sealed class Header : IEquatable<Header>
+    internal class Header : IEquatable<Header>
     {
         private const string HeaderSeparator = ": ";
 
@@ -21,8 +21,8 @@ namespace LightWServer.Core.HttpContext
                 return false;
 
             return ReferenceEquals(this, other)
-                || (Name.Equals(other.Name, StringComparison.OrdinalIgnoreCase)
-                    && Value.Equals(other.Value, StringComparison.OrdinalIgnoreCase));
+                || Name.Equals(other.Name, StringComparison.OrdinalIgnoreCase)
+                    && Value.Equals(other.Value, StringComparison.OrdinalIgnoreCase);
         }
 
         public override bool Equals(object? obj)
